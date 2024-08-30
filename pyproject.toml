@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "goit-web-hw-11"
+version = "0.1.0"
+description = "Homework 11 GoIT"
+package-mode = false
+authors = ["Yevhenii Baranov <j52b10i78@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.112.2"
+uvicorn = "^0.30.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
