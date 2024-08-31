@@ -34,45 +34,40 @@ def search_contacts(
 ):
     return base.query(models.Contact).filter(
         or_(
-            models.Contact.first_name.like(f"%{query}%"),
-            models.Contact.last_name.like(f"%{query}%"),
-            models.Contact.email.like(f"%{query}%")
+            models.Contact.first_name.ilike(f"%{query}%"),
+            models.Contact.last_name.ilike(f"%{query}%"),
+            models.Contact.email.ilike(f"%{query}%")
         )
     ).all()
 
 def get_upcoming_birthdays(
     base: Session
 ):
+    days = 7
     today = datetime.now().date()
-    next_week = today + timedelta(days=7)
 
-    # upcoming_birthdays = []
-    # today = date.today()
+    upcoming_birthdays = []
+    contacts = base.query(models.Contact).all()
+    for contact in contacts:
+        birth_date = contact.birthday
+        try:
+            birthday_this_year = birth_date.replace(year=today.year)
+            if birthday_this_year < today:
+                birthday_this_year = birth_date.replace(year=today.year+1)
+        except TypeError:
+            continue
 
-    # for user, _ in self.data.items():
-    #     birth_date = self.data[user].show_birthday()
-    #     try:
-    #         birthday_this_year = birth_date.replace(year=today.year)
-    #         if birthday_this_year < today:
-    #             birthday_this_year = birth_date.replace(year=today.year+1)
-    #     except TypeError:
-    #         continue
-
-    #     if 0 <= (birthday_this_year - today).days <= days:
-    #         birthday_this_year = adjust_for_weekend(birthday_this_year)
-    #         congratulation_date_str = date_to_string(birthday_this_year)
-    #         upcoming_birthdays.append({
-    #             "name": user,
-    #             "congratulation_date": congratulation_date_str
-    #         })
-    # if upcoming_birthdays:
-    #     return stringify_birthdays(upcoming_birthdays)
-    # return 'No birthdays exspected next week.'
-
-    return base.query(models.Contact).filter(
-        models.Contact.birthday >= today,
-        models.Contact.birthday <= next_week
-    ).all()
+        if 0 <= (birthday_this_year - today).days <= days:
+            if birthday_this_year.weekday() >= 5:
+                days_ahead = 0 - birthday_this_year.weekday()
+                if days_ahead <= 0:
+                    days_ahead += 7
+                birthday_this_year += timedelta(days=days_ahead)
+            contact.birthday = birthday_this_year
+            upcoming_birthdays.append(contact)
+    if upcoming_birthdays:
+        return upcoming_birthdays
+    return []
 
 def update_contact(
     base: Session,
