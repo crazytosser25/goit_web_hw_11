@@ -1,5 +1,4 @@
 """Main file"""
-import logging
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 import src.models as models
@@ -8,13 +7,10 @@ import src.crud as crud
 from src.database import DBSession, engine
 
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='line_num: %(lineno)s > %(message)s'
-)
-
 models.Base.metadata.create_all(bind=engine)
+
 app = FastAPI()
+
 
 def get_db():
     base = DBSession()

@@ -6,21 +6,15 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 
-DBSession = sessionmaker()
 
 load_dotenv()
 
-user = os.getenv("POSTGRES_USER")
-passwd = os.getenv("POSTGRES_PASSWORD")
-host = os.getenv("POSTGRES_HOST")
-port = os.getenv("POSTGRES_PORT")
-dbname = os.getenv("POSTGRES_DB")
-
-DATABASE_URL = f"postgresql://{user}:{passwd}@{host}:{port}/{dbname}"
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 engine = create_engine(
     url=DATABASE_URL,
-    echo=False
+    echo=True
 )
-session = DBSession(bind=engine)
+DBSession = sessionmaker(bind=engine)
+
 Base = declarative_base()
